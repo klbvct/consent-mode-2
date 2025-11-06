@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+
+            try {
+                if (localStorage.getItem('consentMode') === null) {
+                    gtag('consent', 'default', {
+                        'ad_storage': 'denied',
+                        'ad_user_data': 'denied',
+                        'ad_personalization': 'denied',
+                        'analytics_storage': 'denied',
+                        'personalization_storage': 'denied',
+                        'security_storage': 'denied',
+                        'functionality_storage': 'denied'
+                    });
+                } else {
+                    gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+                }
+            } catch (e) {
+                // localStorage может быть недоступен — оставим значения по умолчанию (denied)
+                try {
+                    gtag('consent', 'default', {
+                        'ad_storage': 'denied',
+                        'analytics_storage': 'denied',
+                        'functionality_storage': 'denied',
+                        'personalization_storage': 'denied',
+                        'security_storage': 'denied'
+                    });
+                } catch (err) { /* noop */ }
+            }
+        </script>
+</head>
+<body>
+    <main>
+        <div class="cookie-minimized" id="cookieMinimized">
+            <button class="cookie-button">
+                <span class="cookie-icon">🍪</span>
+                <span class="cookie-text">Настройки cookie</span>
+            </button>
+        </div>
+        <div class="cookie-consent" id="cookieConsent">
+            <div class="cookie-content">
+                <h2>Мы используем файлы cookie 🍪</h2>
+                <p>Мы используем файлы cookie и другие технологии отслеживания для улучшения вашего просмотра на нашем веб-сайте, чтобы показывать вам персонализированный контент и таргетированную рекламу, анализировать трафик нашего веб-сайта и понимать, откуда приходят наши посетители.</p>
+                
+                <div class="cookie-settings">
+                    <div class="cookie-section">
+                        <label class="cookie-switch">
+                            <input type="checkbox" checked disabled>
+                            <span class="slider"></span>
+                        </label>
+                        <div class="cookie-info">
+                            <h3>Необходимые</h3>
+                            <p>Необходимые файлы cookie помогают сделать веб-сайт пригодным к использованию.</p>
+                        </div>
+                    </div>
+
+                    <div class="cookie-section">
+                        <label class="cookie-switch">
+                            <input type="checkbox" id="analytics">
+                            <span class="slider"></span>
+                        </label>
+                        <div class="cookie-info">
+                            <h3>Аналитика</h3>
+                            <p>Помогает понять, как посетители взаимодействуют с веб-сайтом.</p>
+                        </div>
+                    </div>
+
+                    <div class="cookie-section">
+                        <label class="cookie-switch">
+                            <input type="checkbox" id="marketing">
+                            <span class="slider"></span>
+                        </label>
+                        <div class="cookie-info">
+                            <h3>Маркетинг</h3>
+                            <p>Используется для отслеживания посетителей на веб-сайтах с целью показа релевантной рекламы.</p>
+                        </div>
+                    </div>
+
+                    <div class="cookie-section">
+                        <label class="cookie-switch">
+                            <input type="checkbox" id="personalization">
+                            <span class="slider"></span>
+                        </label>
+                        <div class="cookie-info">
+                            <h3>Персонализация</h3>
+                            <p>Разрешает показывать персонализированный контент и рекомендации на основе ваших предпочтений.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cookie-buttons">
+                    <button class="save-preferences">Сохранить настройки</button>
+                    <button class="reject-all">Отклонить все</button>
+                    <button class="accept-all">Принять все</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
