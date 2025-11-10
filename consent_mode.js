@@ -1,4 +1,4 @@
-const TRANSLATIONS_FILE = 'translate.json';
+const TRANSLATIONS_FILE = 'consent_mode.json';
 
 /**
  * Отримує значення з вкладеного об'єкта за ключем-шляхом (наприклад, "cookie_banner.title")
