@@ -32,5 +32,22 @@
         "accept_all": "Прийняти все"
       }
     }
+  },
+  "en": { 
+    "cookie_banner": {
+      "title": "We Use Cookies 🍪",
+      "description": "We use cookies and other tracking technologies to enhance your browsing experience on our website, to show you personalized content and targeted ads, to analyze our website traffic, and to understand where our visitors are coming from.",
+      "categories": {
+        "necessary": { "heading": "Necessary", "info": "Necessary cookies help make a website usable by enabling basic functions like page navigation and access to secure areas of the website." },
+        "analytics": { "heading": "Analytics", "info": "Helps us understand how visitors interact with the website." },
+        "marketing": { "heading": "Marketing", "info": "Used to track visitors across websites with the intention of displaying relevant ads." },
+        "personalization": { "heading": "Personalization", "info": "Allows us to display personalized content and recommendations based on your preferences." }
+      },
+      "buttons": {
+        "save_preferences": "Save Preferences",
+        "reject_all": "Reject All",
+        "accept_all": "Accept All"
+      }
+    }
   }
 }
