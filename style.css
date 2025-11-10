@@ -207,14 +207,10 @@ input:checked + .slider:before {
 }
 
 /* Адаптивность для мобильных устройств */
-@media (max-width: 600px) {
+@media screen and (max-width: 600px) {
     .cookie-consent {
-        /* top: 0;
-        left: 0;
-        transform: none; */
         width: 100%;
-        border-radius: 10px 10px 0 0;
-        /* position: relative; */
+        max-width: 400px;
     }
 
     .cookie-consent h2, .cookie-section h3{
