@@ -1,4 +1,12 @@
 /* Основные стили для баннера */
+html.has-consent-saved #cookieConsent {
+    display: none !important;
+}
+
+html.has-consent-saved #cookieMinimized {
+    display: block !important;
+}
+
 .cookie-consent {
     position: fixed;
     top: 50%;

@@ -1,15 +1,9 @@
 const TRANSLATIONS_FILE = 'consent_mode.json';
 
-/**
- * Отримує значення з вкладеного об'єкта за ключем-шляхом (наприклад, "cookie_banner.title")
- */
 function getValueByPath(obj, path) {
     return path.split('.').reduce((o, i) => (o ? o[i] : undefined), obj);
 }
 
-/**
- * Асинхронно завантажує переклади та локалізує елементи на сторінці.
- */
 async function localizeElements() {
     let allTranslations;
 
@@ -25,13 +19,11 @@ async function localizeElements() {
         return; 
     }
 
-    // Визначаємо мову
     const htmlLang = document.documentElement.getAttribute('lang') || 'ru'; 
     const currentLang = allTranslations.hasOwnProperty(htmlLang) ? htmlLang : 'ru'; 
     
     const langData = allTranslations[currentLang];
 
-    // Локалізуємо всі елементи з атрибутом data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const keyPath = el.getAttribute('data-i18n');
         const translatedText = getValueByPath(langData, keyPath);
@@ -44,13 +36,10 @@ async function localizeElements() {
     });
 }
 
-// ОСНОВНА ЛОГІКА: ОБ'ЄДНАНО В ОДИН DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function () {
-    // *** 1. ЗАПУСК ЛОКАЛІЗАЦІЇ ***
-    // Запускаємо асинхронну локалізацію тексту, яка працює паралельно з логікою згоди.
+
     localizeElements();
     
-    // При завантаженні сторінки — якщо є збережений consentMode, відправити подію consent_update в dataLayer
     try {
         var savedConsent = localStorage.getItem('consentMode');
         if (savedConsent) {
@@ -73,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('Не удалось отправить consent_update при инициализации', e);
     }
     
-    // Ініціалізація елементів (змінні залишаються тими самими)
     const cookieConsent = document.getElementById('cookieConsent');
     const cookieMinimized = document.getElementById('cookieMinimized');
     const acceptAllButton = document.querySelector('.accept-all');
@@ -85,10 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!cookieConsent || !cookieMinimized) return; 
 
-    // ... Весь інший код, що стосується логіки згоди, залишається незмінним:
-    // Міграція, setCheckboxesFromConsentMode, Ініціалізація UI, Обробники кнопок, saveConsentSettings, updateGTMConsent ...
-
-    // Функція для установки стану чекбоксов по consentMode
     function setCheckboxesFromConsentMode(modeObj) {
         if (!modeObj) return;
         analyticsCheckbox.checked = modeObj.analytics_storage === 'granted';
@@ -96,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (personalizationCheckbox) personalizationCheckbox.checked = modeObj.personalization_storage === 'granted';
     }
 
-    // Функція обновления настроек Google Tag Manager
     function updateGTMConsent(mode) {
         if (typeof gtag !== 'function') return;
         try {
@@ -106,7 +89,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // ... (тут має бути код міграції, що був у вашому оригінальному файлі) ...
     try {
         const legacy = localStorage.getItem('cookieConsent');
         const current = localStorage.getItem('consentMode');
@@ -128,22 +110,17 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('Consent migration failed', e);
     }
 
-    // Ініціалізація UI в залежності від consentMode
     const savedMode = localStorage.getItem('consentMode');
-    if (savedMode) {
-        try {
-            const modeObj = JSON.parse(savedMode);
-            setCheckboxesFromConsentMode(modeObj);
-        } catch (e) {
-            console.warn('Не удалось распарсить consentMode', e);
-        }
-        cookieConsent.classList.add('minimized');
-        const content = cookieConsent.querySelector('.cookie-content');
-        if (content) content.style.display = 'none';
-        cookieMinimized.style.display = 'block';
-        updateGTMConsent(JSON.parse(savedMode));
+        if (savedMode) {
+            try {
+                const modeObj = JSON.parse(savedMode);
+                setCheckboxesFromConsentMode(modeObj);
+            } catch (e) {
+                console.warn('Не удалось распарсить consentMode', e);
+            }
+
+            updateGTMConsent(JSON.parse(savedMode));
     } else {
-        // Якщо немає збережених налаштувань — скидаємо чекбокси
         analyticsCheckbox.checked = false;
         marketingCheckbox.checked = false;
         if (personalizationCheckbox) personalizationCheckbox.checked = false;
@@ -151,11 +128,10 @@ document.addEventListener('DOMContentLoaded', function () {
         cookieMinimized.style.display = 'none';
     }
 
-    // Обробник для минимизированной кнопки
     const minimizedButton = cookieMinimized.querySelector('.cookie-button');
     if (minimizedButton) {
         minimizedButton.addEventListener('click', function () {
-            // При відкритті баннера завжди актуалізуємо чекбокси по consentMode
+            document.documentElement.classList.remove('has-consent-saved');
             const saved = localStorage.getItem('consentMode');
             if (saved) {
                 try {
@@ -173,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Обробники кнопок баннера
     if (acceptAllButton) {
         acceptAllButton.addEventListener('click', function () {
             const consentSettings = { analytics: true, marketing: true, personalization: true };
@@ -199,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Функция сохранения настроек — сохраняем ТОЛЬКО в consentMode
     function saveConsentSettings(settings) {
         const mode = {
             ad_storage: settings.marketing ? 'granted' : 'denied',
@@ -217,10 +191,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.warn('Не удалось сохранить consentMode', e);
         }
 
-        // Після збереження — оновити чекбокси в UI
         setCheckboxesFromConsentMode(mode);
 
-        // Відправити подію consent_update в dataLayer для GTM
         try {
             window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
@@ -239,13 +211,11 @@ document.addEventListener('DOMContentLoaded', function () {
             console.warn('Не удалось отправить событие consent_update в dataLayer', e);
         }
 
-        // Згорнемо банер і покажемо кнопку
         cookieConsent.classList.add('minimized');
         const content = cookieConsent.querySelector('.cookie-content');
         if (content) content.style.display = 'none';
         cookieMinimized.style.display = 'block';
 
-        // Оновлюємо вже завантажені теги
         updateGTMConsent(mode);
     }
 });
