@@ -213,7 +213,11 @@ input:checked + .slider:before {
         max-width: 400px;
     }
 
-    .cookie-consent h2, .cookie-section h3{
+    .cookie-consent h2 {
+        font-size: 0.9em;
+    }
+
+    .cookie-section h3{
         font-size: 0.7em;
     }
 
