@@ -7,6 +7,14 @@ html.has-consent-saved #cookieMinimized {
     display: block !important;
 }
 
+html.show-banner #cookieConsent {
+    display: block !important;
+}
+
+html.show-minimized #cookieMinimized {
+    display: block !important;
+}
+
 .cookie-consent {
     position: fixed;
     top: 50%;
@@ -19,6 +27,7 @@ html.has-consent-saved #cookieMinimized {
     max-width: 800px;
     z-index: 9999;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    display: none;
 }
 
 .cookie-content {
@@ -123,6 +132,22 @@ input:disabled + .slider {
 
 input:checked + .slider:before {
     transform: translateX(24px);
+}
+
+/* Стили фокуса для доступности */
+.cookie-switch input:focus + .slider {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+.cookie-buttons button:focus {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+.cookie-button:focus {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
 }
 
 /* Стили для кнопок */

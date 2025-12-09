@@ -16,7 +16,26 @@ async function localizeElements() {
 
     } catch (error) {
         console.error("Помилка завантаження або парсингу перекладів:", error);
-        return; 
+        // Fallback переводы
+        allTranslations = {
+            ru: {
+                cookie_banner: {
+                    title: "Мы используем файлы cookie 🍪",
+                    description: "Мы используем файлы cookie и другие технологии отслеживания для улучшения вашего просмотра на нашем веб-сайте, чтобы показывать вам персонализированный контент и таргетированную рекламу, анализировать трафик нашего веб-сайта и понимать, откуда приходят наши посетители.",
+                    categories: {
+                        necessary: { heading: "Необходимые", info: "Необходимые файлы cookie помогают сделать веб-сайт пригодным к использованию." },
+                        analytics: { heading: "Аналитика", info: "Помогает понять, как посетители взаимодействуют с веб-сайтом." },
+                        marketing: { heading: "Маркетинг", info: "Используется для отслеживания посетителей на веб-сайтах с целью показа релевантной рекламы." },
+                        personalization: { heading: "Персонализация", info: "Разрешает показывать персонализированный контент и рекомендации на основе ваших предпочтений." }
+                    },
+                    buttons: {
+                        save_preferences: "Сохранить настройки",
+                        reject_all: "Отклонить все",
+                        accept_all: "Принять все"
+                    }
+                }
+            }
+        };
     }
 
     const htmlLang = document.documentElement.getAttribute('lang') || 'ru'; 
@@ -36,27 +55,46 @@ async function localizeElements() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+function sendConsentToDataLayer(mode) {
+    try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: 'consent_update',
+            consent: {
+                ad_storage: mode.ad_storage,
+                ad_user_data: mode.ad_user_data,
+                ad_personalization: mode.ad_personalization,
+                analytics_storage: mode.analytics_storage,
+                personalization_storage: mode.personalization_storage,
+                functionality_storage: mode.functionality_storage,
+                security_storage: mode.security_storage
+            }
+        });
+    } catch (e) {
+        console.warn('Не удалось отправить consent_update в dataLayer', e);
+    }
+}
 
-    localizeElements();
+function isValidConsentMode(mode) {
+    if (!mode || typeof mode !== 'object') return false;
+    const validValues = ['granted', 'denied'];
+    const requiredFields = ['ad_storage', 'analytics_storage', 'functionality_storage', 'security_storage'];
+    return requiredFields.every(field => 
+        mode.hasOwnProperty(field) && validValues.includes(mode[field])
+    );
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+
+    await localizeElements();
     
     try {
         var savedConsent = localStorage.getItem('consentMode');
         if (savedConsent) {
             var mode = JSON.parse(savedConsent);
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-                event: 'consent_update',
-                consent: {
-                    ad_storage: mode.ad_storage,
-                    ad_user_data: mode.ad_user_data,
-                    ad_personalization: mode.ad_personalization,
-                    analytics_storage: mode.analytics_storage,
-                    personalization_storage: mode.personalization_storage,
-                    functionality_storage: mode.functionality_storage,
-                    security_storage: mode.security_storage
-                }
-            });
+            if (isValidConsentMode(mode)) {
+                sendConsentToDataLayer(mode);
+            }
         }
     } catch (e) {
         console.warn('Не удалось отправить consent_update при инициализации', e);
@@ -111,27 +149,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const savedMode = localStorage.getItem('consentMode');
-        if (savedMode) {
-            try {
-                const modeObj = JSON.parse(savedMode);
+    if (savedMode) {
+        try {
+            const modeObj = JSON.parse(savedMode);
+            if (isValidConsentMode(modeObj)) {
                 setCheckboxesFromConsentMode(modeObj);
-            } catch (e) {
-                console.warn('Не удалось распарсить consentMode', e);
+                updateGTMConsent(modeObj);
+            } else {
+                localStorage.removeItem('consentMode');
+                throw new Error('Invalid consent mode');
             }
-
-            updateGTMConsent(JSON.parse(savedMode));
+        } catch (e) {
+            console.warn('Не удалось распарсить consentMode', e);
+            localStorage.removeItem('consentMode');
+            analyticsCheckbox.checked = false;
+            marketingCheckbox.checked = false;
+            if (personalizationCheckbox) personalizationCheckbox.checked = false;
+        }
     } else {
         analyticsCheckbox.checked = false;
         marketingCheckbox.checked = false;
         if (personalizationCheckbox) personalizationCheckbox.checked = false;
-        cookieConsent.style.display = 'block';
-        cookieMinimized.style.display = 'none';
     }
 
     const minimizedButton = cookieMinimized.querySelector('.cookie-button');
     if (minimizedButton) {
         minimizedButton.addEventListener('click', function () {
-            document.documentElement.classList.remove('has-consent-saved');
+            document.documentElement.classList.remove('has-consent-saved', 'show-minimized');
+            document.documentElement.classList.add('show-banner');
             const saved = localStorage.getItem('consentMode');
             if (saved) {
                 try {
@@ -145,7 +190,6 @@ document.addEventListener('DOMContentLoaded', function () {
             cookieConsent.classList.remove('minimized');
             const content = cookieConsent.querySelector('.cookie-content');
             if (content) content.style.display = 'block';
-            cookieMinimized.style.display = 'none';
         });
     }
 
@@ -193,28 +237,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         setCheckboxesFromConsentMode(mode);
 
-        try {
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-                event: 'consent_update',
-                consent: {
-                    ad_storage: mode.ad_storage,
-                    ad_user_data: mode.ad_user_data,
-                    ad_personalization: mode.ad_personalization,
-                    analytics_storage: mode.analytics_storage,
-                    personalization_storage: mode.personalization_storage,
-                    functionality_storage: mode.functionality_storage,
-                    security_storage: mode.security_storage
-                }
-            });
-        } catch (e) {
-            console.warn('Не удалось отправить событие consent_update в dataLayer', e);
-        }
+        sendConsentToDataLayer(mode);
 
+        document.documentElement.classList.remove('show-banner');
+        document.documentElement.classList.add('show-minimized');
         cookieConsent.classList.add('minimized');
         const content = cookieConsent.querySelector('.cookie-content');
         if (content) content.style.display = 'none';
-        cookieMinimized.style.display = 'block';
 
         updateGTMConsent(mode);
     }

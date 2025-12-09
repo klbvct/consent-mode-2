@@ -5,7 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="consent_mode.css">
-        <script>
+    <script>
+        // Предотвращаем мигание баннера
+        (function() {
+            try {
+                var savedMode = localStorage.getItem('consentMode');
+                if (!savedMode) {
+                    document.documentElement.classList.add('show-banner');
+                } else {
+                    document.documentElement.classList.add('show-minimized');
+                }
+            } catch (e) {
+                document.documentElement.classList.add('show-banner');
+            }
+        })();
+    </script>
+    <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
 
@@ -40,14 +55,14 @@
 <body>
     <main>
         <div class="cookie-minimized" id="cookieMinimized">
-            <button class="cookie-button">
+            <button class="cookie-button" aria-label="Открыть настройки cookie">
                 <span class="cookie-icon">🍪</span>
             </button>
         </div>
-        <div class="cookie-consent" id="cookieConsent">
+        <div class="cookie-consent" id="cookieConsent" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-desc" aria-modal="true">
             <div class="cookie-content">
-                <h2 data-i18n="cookie_banner.title">Мы используем файлы cookie 🍪</h2>
-                <p data-i18n="cookie_banner.description">Мы используем файлы cookie и другие технологии отслеживания для улучшения вашего просмотра на нашем веб-сайте, чтобы показывать вам персонализированный контент и таргетированную рекламу, анализировать трафик нашего веб-сайта и понимать, откуда приходят наши посетители.</p>
+                <h2 id="cookie-title" data-i18n="cookie_banner.title">Мы используем файлы cookie 🍪</h2>
+                <p id="cookie-desc" data-i18n="cookie_banner.description">Мы используем файлы cookie и другие технологии отслеживания для улучшения вашего просмотра на нашем веб-сайте, чтобы показывать вам персонализированный контент и таргетированную рекламу, анализировать трафик нашего веб-сайта и понимать, откуда приходят наши посетители.</p>
                 
                 <div class="cookie-settings">
                     
